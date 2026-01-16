@@ -41,7 +41,7 @@ class OnboardingScreen extends ConsumerWidget {
               ),
               const Spacer(),
               ElevatedButton(
-                onPressed: () => context.go('/home'),
+                onPressed: () => context.go('/onboarding/postal-code'),
                 child: Text(l10n.getStarted),
               ),
               const SizedBox(height: 16),

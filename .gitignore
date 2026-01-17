@@ -60,3 +60,9 @@ coverage/
 # Supabase
 supabase/.branches
 supabase/.temp
+
+# Web build (Vercel will build this)
+build/web/
+
+# Keep web source files
+!web/

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class PostalCodeScreen extends ConsumerStatefulWidget {
   const PostalCodeScreen({super.key});
@@ -37,7 +38,12 @@ class _PostalCodeScreenState extends ConsumerState<PostalCodeScreen> {
         _errorMessage = null;
       } else if (value.length == 5) {
         _isValid = _validateSwedishPostalCode(value);
-        _errorMessage = _isValid ? null : 'Ogiltigt svenskt postnummer';
+        if (!_isValid) {
+          final l10n = AppLocalizations.of(context);
+          _errorMessage = l10n.t('invalid_postal');
+        } else {
+          _errorMessage = null;
+        }
       } else {
         _isValid = false;
         _errorMessage = null;
@@ -55,9 +61,11 @@ class _PostalCodeScreenState extends ConsumerState<PostalCodeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Civil Beredskap'),
+        title: Text(l10n.t('app_name')),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/onboarding'),
@@ -70,26 +78,28 @@ class _PostalCodeScreenState extends ConsumerState<PostalCodeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 16),
-              const Text(
-                'Steg 1 av 4',
-                style: TextStyle(
+              Text(
+                l10n.t('step_1_of_4'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 24),
               Text(
-                'Ditt postnummer',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                l10n.t('postal_code'),
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
-                'Vi använder detta för att beräkna dina behov och visa områdesstatistik',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                l10n.t('enter_postal_code'),
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
               ),
               const SizedBox(height: 32),
               TextField(
@@ -101,7 +111,7 @@ class _PostalCodeScreenState extends ConsumerState<PostalCodeScreen> {
                 ],
                 onChanged: _onPostalCodeChanged,
                 decoration: InputDecoration(
-                  labelText: 'Postnummer',
+                  labelText: l10n.t('postal_code'),
                   hintText: '11522',
                   prefixIcon: const Icon(Icons.location_on),
                   suffixIcon: _isValid
@@ -123,15 +133,15 @@ class _PostalCodeScreenState extends ConsumerState<PostalCodeScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Nästa',
-                  style: TextStyle(fontSize: 16),
+                child: Text(
+                  l10n.t('next_btn'),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => context.go('/onboarding'),
-                child: const Text('Tillbaka'),
+                child: Text(l10n.t('back')),
               ),
             ],
           ),

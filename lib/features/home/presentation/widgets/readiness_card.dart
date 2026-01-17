@@ -1,89 +1,90 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class ReadinessCard extends StatelessWidget {
   final String level;
   final double percentage;
-  final Color color;
 
   const ReadinessCard({
     super.key,
     required this.level,
     required this.percentage,
-    required this.color,
   });
+
+  Color get _progressColor => AppColors.getProgressColor(percentage);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[300]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 80,
-            height: 80,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 80,
-                  height: 80,
-                  child: CircularProgressIndicator(
-                    value: percentage / 100,
-                    strokeWidth: 8,
-                    backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(color),
+    final isComplete = percentage >= 100;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.s),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 120,
+              height: 120,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 120,
+                    height: 120,
+                    child: CircularProgressIndicator(
+                      value: percentage / 100,
+                      strokeWidth: 8,
+                      backgroundColor: AppColors.border,
+                      valueColor: AlwaysStoppedAnimation<Color>(_progressColor),
+                    ),
                   ),
-                ),
-                Text(
-                  '${percentage.toInt()}%',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
-                ),
-              ],
+                  if (isComplete)
+                    Icon(
+                      Icons.check_circle,
+                      size: 48,
+                      color: _progressColor,
+                    )
+                  else
+                    Text(
+                      '${percentage.toInt()}%',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: _progressColor,
+                          ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            level,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            _getStatusText(percentage),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
-                ),
-          ),
-        ],
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              level,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.xxs),
+            Text(
+              _getStatusText(context, percentage),
+              style: Theme.of(context).textTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  String _getStatusText(double percentage) {
-    if (percentage == 0) return 'Inte påbörjad';
-    if (percentage < 25) return 'Påbörjad';
-    if (percentage < 50) return 'Pågående';
-    if (percentage < 75) return 'Bra framsteg';
-    if (percentage < 100) return 'Nästan klar';
-    return 'Klar!';
+  String _getStatusText(BuildContext context, double percentage) {
+    final l10n = AppLocalizations.of(context);
+    if (percentage == 0) return l10n.t('not_started');
+    if (percentage < 25) return l10n.t('started');
+    if (percentage < 50) return l10n.t('in_progress');
+    if (percentage < 75) return l10n.t('good_progress');
+    if (percentage < 100) return l10n.t('almost_done');
+    return l10n.t('done');
   }
 }

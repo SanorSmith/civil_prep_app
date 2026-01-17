@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../models/prep_category_model.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class CategoryCard extends StatelessWidget {
   final PrepCategory category;
@@ -23,8 +27,8 @@ class CategoryCard extends StatelessWidget {
         return Icons.local_fire_department;
       case 'clean_hands':
         return Icons.clean_hands;
-      case 'phone':
-        return Icons.phone;
+      case 'radio':
+        return Icons.radio;
       case 'medical_services':
         return Icons.medical_services;
       case 'lightbulb':
@@ -38,72 +42,150 @@ class CategoryCard extends StatelessWidget {
     }
   }
 
-  Color _getProgressColor(double progress) {
-    if (progress < 33) return Colors.red;
-    if (progress < 67) return Colors.orange;
-    return Colors.green;
+  String _getCategoryName(BuildContext context, String categoryId) {
+    final l10n = AppLocalizations.of(context);
+    switch (categoryId) {
+      case 'water':
+        return l10n.t('water');
+      case 'food':
+        return l10n.t('food');
+      case 'heating':
+        return l10n.t('heat');
+      case 'hygiene':
+        return l10n.t('hygiene');
+      case 'communication':
+        return l10n.t('radio');
+      case 'first_aid':
+        return l10n.t('medicine');
+      case 'lighting':
+        return l10n.t('light');
+      case 'documents':
+        return l10n.t('cash');
+      case 'cash':
+        return l10n.t('cash');
+      default:
+        return category.name;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final progressColor = _getProgressColor(progress);
+    final categoryColors = AppColors.getCategoryColors(category.id);
+    final primaryColor = categoryColors['primary']!;
+    final lightColor = categoryColors['light']!;
+    final darkColor = categoryColors['dark']!;
+    final progressColor = progress >= 100 ? AppColors.success : primaryColor;
+    final isComplete = progress >= 100;
 
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              lightColor.withOpacity(0.05),
+              const Color(0xFF1E1E1E),
+            ],
+          ),
+          border: Border.all(
+            color: primaryColor.withOpacity(0.3),
+            width: 1,
+          ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[300]!),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.all(12),
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    primaryColor.withOpacity(0.3),
+                    primaryColor.withOpacity(0.1),
+                  ],
+                ),
               ),
               child: Icon(
                 _getIconData(category.icon),
-                size: 32,
-                color: Theme.of(context).colorScheme.primary,
+                size: 40,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              category.name,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              _getCategoryName(context, category.id),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: progress / 100,
-              backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-              borderRadius: BorderRadius.circular(4),
+            const SizedBox(height: 10),
+            Container(
+              height: 6,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(3),
+                boxShadow: isComplete
+                    ? [
+                        BoxShadow(
+                          color: AppColors.success.withOpacity(0.5),
+                          blurRadius: 8,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: LinearProgressIndicator(
+                  value: progress / 100,
+                  backgroundColor: const Color(0xFF2C2C2C),
+                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                ),
+              ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              '${progress.toInt()}%',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: progressColor,
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${progress.toInt()}%',
+                  style: const TextStyle(
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
+                ),
+                if (isComplete) ...[
+                  const SizedBox(width: 6),
+                  const Icon(
+                    Icons.check_circle,
+                    size: 18,
+                    color: AppColors.success,
+                  ),
+                ],
+              ],
             ),
           ],
         ),

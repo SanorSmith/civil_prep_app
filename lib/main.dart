@@ -4,10 +4,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/config/app_config.dart';
 import 'core/services/storage_service.dart';
-import 'models/user_model.dart';
-import 'models/household_profile_model.dart';
 import 'models/prep_item_model.dart';
 import 'models/prep_category_model.dart';
+import 'models/household_profile_model.dart';
 import 'app.dart';
 
 void main() async {
@@ -25,9 +24,8 @@ void main() async {
 Future<void> _initializeApp() async {
   await Hive.initFlutter();
   
-  // Register all Hive adapters BEFORE opening boxes
-  Hive.registerAdapter(UserAdapter());
-  Hive.registerAdapter(HouseholdProfileAdapter());
+  // Register Hive adapters for PrepItem and PrepCategory only
+  // User and HouseholdProfile now use SharedPreferences (no adapters needed)
   Hive.registerAdapter(PrepItemAdapter());
   Hive.registerAdapter(PrepCategoryAdapter());
   

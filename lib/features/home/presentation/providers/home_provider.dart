@@ -4,6 +4,7 @@ import '../../../../models/household_profile_model.dart';
 import '../../../../models/prep_item_model.dart';
 import '../../../../models/prep_category_model.dart';
 import '../../../../models/user_model.dart';
+import '../../../../core/services/storage_service.dart';
 import '../../../preparedness/domain/services/preparedness_calculator.dart';
 import '../../../preparedness/domain/services/progress_calculator.dart';
 
@@ -69,11 +70,10 @@ class HomeNotifier extends StateNotifier<HomeState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      // Try to load from Hive first
-      final userBox = await Hive.openBox<User>('users');
-      if (userBox.isNotEmpty) {
-        final user = userBox.values.first;
-        await loadDataFromHive(user.id);
+      // Try to load from SharedPreferences first
+      final user = await StorageService.getUserProfile();
+      if (user != null) {
+        await loadDataFromStorage();
       } else {
         // Fallback to mock data if no user exists
         await _generateMockData();
@@ -88,20 +88,20 @@ class HomeNotifier extends StateNotifier<HomeState> {
     }
   }
 
-  Future<void> loadDataFromHive(String userId) async {
+  Future<void> loadDataFromStorage() async {
     try {
-      // Load profile
-      final profileBox = await Hive.openBox<HouseholdProfile>('household_profiles');
-      final profile = profileBox.values.firstWhere(
-        (p) => p.userId == userId,
-        orElse: () => throw Exception('Profile not found'),
-      );
+      // Load user and profile from SharedPreferences
+      final user = await StorageService.getUserProfile();
+      if (user == null) throw Exception('User not found');
+      
+      final profile = await StorageService.getHouseholdProfile();
+      if (profile == null) throw Exception('Profile not found');
 
-      // Load items
+      // Load items from Hive
       final itemsBox = await Hive.openBox('prep_items');
       final items = itemsBox.values
           .whereType<PrepItem>()
-          .where((item) => item.userId == userId)
+          .where((item) => item.userId == user.id)
           .toList();
 
       // Generate categories
@@ -129,7 +129,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
         nextSteps: nextSteps,
       );
     } catch (e) {
-      print('Error loading from Hive: $e');
+      print('Error loading from storage: $e');
       rethrow;
     }
   }

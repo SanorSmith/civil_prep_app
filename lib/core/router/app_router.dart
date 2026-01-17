@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/language/presentation/screens/language_selection_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/onboarding/presentation/screens/postal_code_screen.dart';
@@ -9,11 +10,33 @@ import '../../features/onboarding/presentation/screens/household_profile_screen.
 import '../../features/onboarding/presentation/screens/household_size_screen.dart';
 import '../../features/onboarding/presentation/screens/special_needs_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_summary_screen.dart';
+import '../services/storage_service.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/onboarding',
+    initialLocation: '/language',
+    redirect: (context, state) async {
+      // Check if language is already set
+      final savedLanguage = await StorageService.getLanguage();
+      
+      // If on language screen and language is already set, redirect to onboarding
+      if (state.matchedLocation == '/language' && savedLanguage != null) {
+        return '/onboarding';
+      }
+      
+      // If not on language screen and language is not set, redirect to language
+      if (state.matchedLocation != '/language' && savedLanguage == null) {
+        return '/language';
+      }
+      
+      return null; // No redirect needed
+    },
     routes: [
+      GoRoute(
+        path: '/language',
+        name: 'language',
+        builder: (context, state) => const LanguageSelectionScreen(),
+      ),
       GoRoute(
         path: '/onboarding',
         name: 'onboarding',

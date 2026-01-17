@@ -88,7 +88,7 @@ class PrepItem with _$PrepItem {
       categoryId: existing.categoryId,
       name: existing.name,
       targetQuantity: existing.targetQuantity,
-      currentQuantity: existing.currentQuantity,
+      currentQuantity: completed ? existing.targetQuantity : 0,
       unit: existing.unit,
       isCompleted: completed,
       completedAt: completed ? DateTime.now() : null,

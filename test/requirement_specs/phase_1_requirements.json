@@ -1,0 +1,78 @@
+{
+  "phase": 1,
+  "name": "Onboarding Flow",
+  "requirements": [
+    {
+      "id": "REQ-1.1",
+      "description": "Welcome screen exists",
+      "check_type": "screen_exists",
+      "check_value": "onboarding_screen"
+    },
+    {
+      "id": "REQ-1.2",
+      "description": "Postal code screen exists",
+      "check_type": "screen_exists",
+      "check_value": "postal_code_screen"
+    },
+    {
+      "id": "REQ-1.3",
+      "description": "Postal code validator exists",
+      "check_type": "function_exists",
+      "check_value": "isValidSwedishPostalCode"
+    },
+    {
+      "id": "REQ-1.4",
+      "description": "Housing profile screen exists",
+      "check_type": "screen_exists",
+      "check_value": "household_profile_screen"
+    },
+    {
+      "id": "REQ-1.5",
+      "description": "Household size screen exists",
+      "check_type": "screen_exists",
+      "check_value": "household_size_screen"
+    },
+    {
+      "id": "REQ-1.6",
+      "description": "Special needs screen exists",
+      "check_type": "screen_exists",
+      "check_value": "special_needs_screen"
+    },
+    {
+      "id": "REQ-1.7",
+      "description": "Onboarding summary screen exists",
+      "check_type": "screen_exists",
+      "check_value": "onboarding_summary_screen"
+    },
+    {
+      "id": "REQ-1.8",
+      "description": "Onboarding provider exists",
+      "check_type": "class_exists",
+      "check_value": "OnboardingProvider"
+    },
+    {
+      "id": "REQ-1.9",
+      "description": "HouseholdProfile model exists",
+      "check_type": "class_exists",
+      "check_value": "HouseholdProfile"
+    },
+    {
+      "id": "REQ-1.10",
+      "description": "User model exists",
+      "check_type": "class_exists",
+      "check_value": "User"
+    },
+    {
+      "id": "REQ-1.11",
+      "description": "Storage service has saveUserProfile method",
+      "check_type": "function_exists",
+      "check_value": "saveUserProfile"
+    },
+    {
+      "id": "REQ-1.12",
+      "description": "Storage service has saveHouseholdProfile method",
+      "check_type": "function_exists",
+      "check_value": "saveHouseholdProfile"
+    }
+  ]
+}

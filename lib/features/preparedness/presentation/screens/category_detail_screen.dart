@@ -38,8 +38,8 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
         return Icons.local_fire_department;
       case 'clean_hands':
         return Icons.clean_hands;
-      case 'phone':
-        return Icons.phone;
+      case 'radio':
+        return Icons.radio;
       case 'medical_services':
         return Icons.medical_services;
       case 'lightbulb':

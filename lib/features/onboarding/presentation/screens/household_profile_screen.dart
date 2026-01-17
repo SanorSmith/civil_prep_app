@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../models/household_profile_model.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../providers/onboarding_provider.dart';
 
 class HouseholdProfileScreen extends ConsumerStatefulWidget {
@@ -42,9 +43,11 @@ class _HouseholdProfileScreenState extends ConsumerState<HouseholdProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Civil Beredskap'),
+        title: Text(l10n.t('app_name')),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/onboarding/postal-code'),
@@ -57,23 +60,23 @@ class _HouseholdProfileScreenState extends ConsumerState<HouseholdProfileScreen>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 16),
-              const Text(
-                'Steg 2 av 4',
-                style: TextStyle(
+              Text(
+                l10n.t('step_2_of_4'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 24),
               Text(
-                'Din boendesituation',
+                l10n.t('housing_situation'),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 12),
               Text(
-                'Detta hjälper oss beräkna dina beredskapsbehov',
+                l10n.t('housing_situation_desc'),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.grey[600],
                     ),
@@ -84,8 +87,8 @@ class _HouseholdProfileScreenState extends ConsumerState<HouseholdProfileScreen>
                   children: [
                     _HousingTypeCard(
                       icon: Icons.apartment,
-                      title: 'Lägenhet',
-                      description: 'Flerbostadshus',
+                      title: l10n.t('apartment'),
+                      description: l10n.t('apartment_desc'),
                       housingType: HousingType.apartment,
                       isSelected: _selectedHousingType == HousingType.apartment,
                       onTap: () => _onHousingTypeSelected(HousingType.apartment),
@@ -93,8 +96,8 @@ class _HouseholdProfileScreenState extends ConsumerState<HouseholdProfileScreen>
                     const SizedBox(height: 16),
                     _HousingTypeCard(
                       icon: Icons.home,
-                      title: 'Villa/Radhus',
-                      description: 'Egen- eller radhus',
+                      title: l10n.t('house'),
+                      description: l10n.t('house_desc'),
                       housingType: HousingType.house,
                       isSelected: _selectedHousingType == HousingType.house,
                       onTap: () => _onHousingTypeSelected(HousingType.house),
@@ -102,8 +105,8 @@ class _HouseholdProfileScreenState extends ConsumerState<HouseholdProfileScreen>
                     const SizedBox(height: 16),
                     _HousingTypeCard(
                       icon: Icons.landscape,
-                      title: 'Lantbruk/Landsbygd',
-                      description: 'Gård eller landsbygd',
+                      title: l10n.t('rural'),
+                      description: l10n.t('rural_desc'),
                       housingType: HousingType.rural,
                       isSelected: _selectedHousingType == HousingType.rural,
                       onTap: () => _onHousingTypeSelected(HousingType.rural),
@@ -120,15 +123,15 @@ class _HouseholdProfileScreenState extends ConsumerState<HouseholdProfileScreen>
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Nästa',
-                  style: TextStyle(fontSize: 16),
+                child: Text(
+                  l10n.t('next_btn'),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => context.go('/onboarding/postal-code'),
-                child: const Text('Tillbaka'),
+                child: Text(l10n.t('back')),
               ),
             ],
           ),

@@ -24,7 +24,7 @@ class NextStepItem extends StatelessWidget {
       case 'hygiene':
         return Icons.clean_hands;
       case 'communication':
-        return Icons.phone;
+        return Icons.radio;
       case 'first_aid':
         return Icons.medical_services;
       case 'lighting':

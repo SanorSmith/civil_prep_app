@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../providers/onboarding_provider.dart';
 
 class SpecialNeedsScreen extends ConsumerStatefulWidget {
@@ -32,9 +33,11 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Civil Beredskap'),
+        title: Text(l10n.t('app_name')),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/onboarding/household-size'),
@@ -47,23 +50,23 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 16),
-              const Text(
-                'Steg 4 av 4',
-                style: TextStyle(
+              Text(
+                l10n.t('step_4_of_4'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 24),
               Text(
-                'Särskilda behov',
+                l10n.t('special_needs'),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 12),
               Text(
-                'Finns det något vi bör veta?',
+                l10n.t('special_needs_desc'),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.grey[600],
                     ),
@@ -73,8 +76,8 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
                 child: ListView(
                   children: [
                     CheckboxListTile(
-                      title: const Text('Medicinsk utrustning som kräver el'),
-                      subtitle: const Text('T.ex. syrgaskoncentrator, CPAP'),
+                      title: Text(l10n.t('medical_equipment')),
+                      subtitle: Text(l10n.t('medical_equipment_desc')),
                       value: _hasMedicalEquipment,
                       onChanged: (value) {
                         setState(() => _hasMedicalEquipment = value ?? false);
@@ -82,10 +85,10 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
                       contentPadding: EdgeInsets.zero,
                     ),
                     CheckboxListTile(
-                      title: const Text('Husdjur'),
+                      title: Text(l10n.t('pets')),
                       subtitle: _hasPets
-                          ? Text('Antal: $_petCount')
-                          : const Text('Katt, hund, eller andra djur'),
+                          ? Text('${l10n.t('pet_count')}: $_petCount')
+                          : Text(l10n.t('pets_desc')),
                       value: _hasPets,
                       onChanged: (value) {
                         setState(() => _hasPets = value ?? false);
@@ -97,7 +100,7 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
                         padding: const EdgeInsets.only(left: 16, bottom: 16),
                         child: Row(
                           children: [
-                            const Text('Antal husdjur:'),
+                            Text('${l10n.t('pet_count')}:'),
                             const SizedBox(width: 16),
                             IconButton(
                               onPressed: _petCount > 1
@@ -119,8 +122,8 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
                         ),
                       ),
                     CheckboxListTile(
-                      title: const Text('Rörelsehinder'),
-                      subtitle: const Text('Begränsad rörlighet'),
+                      title: Text(l10n.t('mobility')),
+                      subtitle: Text(l10n.t('mobility_desc')),
                       value: _hasLimitedMobility,
                       onChanged: (value) {
                         setState(() => _hasLimitedMobility = value ?? false);
@@ -128,8 +131,8 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
                       contentPadding: EdgeInsets.zero,
                     ),
                     CheckboxListTile(
-                      title: const Text('Matallergier'),
-                      subtitle: const Text('Celiaki, laktos, nötter, etc.'),
+                      title: Text(l10n.t('allergies')),
+                      subtitle: Text(l10n.t('allergies_desc')),
                       value: _hasAllergies,
                       onChanged: (value) {
                         setState(() => _hasAllergies = value ?? false);
@@ -142,8 +145,8 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
                       maxLines: 3,
                       maxLength: 200,
                       decoration: InputDecoration(
-                        labelText: 'Annan information (valfritt)',
-                        hintText: 'T.ex. särskilda mediciner, behov...',
+                        labelText: l10n.t('other_info'),
+                        hintText: l10n.t('other_info_hint'),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -153,31 +156,43 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.blue[50],
+                        color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.blue[200]!),
+                        border: Border.all(color: const Color(0xFFBBDEFB)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.privacy_tip, color: Colors.blue[700]),
+                              const Icon(Icons.privacy_tip, color: Color(0xFF005AA0)),
                               const SizedBox(width: 8),
                               Text(
-                                'Integritet',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue[700],
-                                    ),
+                                l10n.t('privacy'),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF005AA0),
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 12),
                           SwitchListTile(
-                            title: const Text('Dela anonym statistik'),
-                            subtitle: const Text(
-                              'Hjälp andra i ditt område genom att anonymt dela dina framsteg',
+                            title: Text(
+                              l10n.t('share_data'),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF212121),
+                              ),
+                            ),
+                            subtitle: Text(
+                              l10n.t('share_data_desc'),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF424242),
+                              ),
                             ),
                             value: _allowAggregation,
                             onChanged: (value) {
@@ -187,10 +202,11 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Din data skyddas med k-anonymitet. Vi visar endast områdesstatistik när minst 50 hushåll deltar.',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[700],
-                                ),
+                            l10n.t('privacy_explanation'),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF424242),
+                            ),
                           ),
                         ],
                       ),
@@ -207,15 +223,15 @@ class _SpecialNeedsScreenState extends ConsumerState<SpecialNeedsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Slutför',
-                  style: TextStyle(fontSize: 16),
+                child: Text(
+                  l10n.t('finish'),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => context.go('/onboarding/household-size'),
-                child: const Text('Tillbaka'),
+                child: Text(l10n.t('back')),
               ),
             ],
           ),

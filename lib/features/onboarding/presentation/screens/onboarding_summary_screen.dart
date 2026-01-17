@@ -4,29 +4,33 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../models/household_profile_model.dart';
 import '../../../../models/user_model.dart';
+import '../../../../core/services/storage_service.dart';
 import '../providers/onboarding_provider.dart';
 import '../../../preparedness/domain/services/preparedness_calculator.dart';
 import '../../../home/presentation/providers/home_provider.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class OnboardingSummaryScreen extends ConsumerWidget {
   const OnboardingSummaryScreen({super.key});
 
-  String _getHousingTypeLabel(HousingType type) {
+  String _getHousingTypeLabel(BuildContext context, HousingType type) {
+    final l10n = AppLocalizations.of(context);
     switch (type) {
       case HousingType.apartment:
-        return 'Lägenhet';
+        return l10n.t('apartment');
       case HousingType.house:
-        return 'Villa/Radhus';
+        return l10n.t('house');
       case HousingType.rural:
-        return 'Lantbruk/Landsbygd';
+        return l10n.t('rural');
     }
   }
 
-  String _getHouseholdSummary(int adults, int children, int infants) {
+  String _getHouseholdSummary(BuildContext context, int adults, int children, int infants) {
+    final l10n = AppLocalizations.of(context);
     final parts = <String>[];
-    if (adults > 0) parts.add('$adults ${adults == 1 ? 'vuxen' : 'vuxna'}');
-    if (children > 0) parts.add('$children barn');
-    if (infants > 0) parts.add('$infants ${infants == 1 ? 'spädbarn' : 'spädbarn'}');
+    if (adults > 0) parts.add('$adults ${adults == 1 ? l10n.t('adult_singular') : l10n.t('adults').toLowerCase()}');
+    if (children > 0) parts.add('$children ${l10n.t('children').toLowerCase()}');
+    if (infants > 0) parts.add('$infants ${l10n.t('infants').toLowerCase()}');
     return parts.join(', ');
   }
 
@@ -53,12 +57,9 @@ class OnboardingSummaryScreen extends ConsumerWidget {
         allowAggregation: onboardingState.allowAggregation,
       );
 
-      // Save to Hive
-      final userBox = await Hive.openBox<User>('users');
-      await userBox.put(user.id, user);
-
-      final profileBox = await Hive.openBox<HouseholdProfile>('household_profiles');
-      await profileBox.put(profile.id, profile);
+      // Save to SharedPreferences (no Hive adapters needed!)
+      await StorageService.saveUserProfile(user);
+      await StorageService.saveHouseholdProfile(profile);
 
       // Generate preparedness items
       final calculator = PreparednessCalculator();
@@ -67,14 +68,14 @@ class OnboardingSummaryScreen extends ConsumerWidget {
         userId: user.id,
       );
 
-      // Save items to Hive
+      // Save items to Hive (PrepItem adapters are registered)
       final itemsBox = await Hive.openBox('prep_items');
       for (final item in items) {
         await itemsBox.put(item.id, item);
       }
 
       // Load data into home provider
-      await ref.read(homeProvider.notifier).loadDataFromHive(user.id);
+      await ref.read(homeProvider.notifier).loadDataFromStorage();
 
       // Navigate to home
       if (context.mounted) {
@@ -92,11 +93,12 @@ class OnboardingSummaryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final onboardingState = ref.watch(onboardingProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Din beredskapsprofil'),
+        title: Text(l10n.t('app_name')),
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -122,7 +124,7 @@ class OnboardingSummaryScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Profilen är klar!',
+                l10n.t('profile_complete'),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -130,7 +132,7 @@ class OnboardingSummaryScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Baserat på ditt hushåll har vi beräknat dina beredskapsbehov',
+                l10n.t('profile_desc'),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.grey[600],
                     ),
@@ -142,22 +144,23 @@ class OnboardingSummaryScreen extends ConsumerWidget {
                   children: [
                     _SummaryCard(
                       icon: Icons.location_on,
-                      title: 'Postnummer',
-                      value: onboardingState.postalCode ?? 'Ej angivet',
+                      title: l10n.t('postal_code'),
+                      value: onboardingState.postalCode ?? l10n.t('not_specified'),
                     ),
                     const SizedBox(height: 12),
                     _SummaryCard(
                       icon: Icons.home,
-                      title: 'Boendetyp',
+                      title: l10n.t('housing_type'),
                       value: onboardingState.housingType != null
-                          ? _getHousingTypeLabel(onboardingState.housingType!)
-                          : 'Ej angivet',
+                          ? _getHousingTypeLabel(context, onboardingState.housingType!)
+                          : l10n.t('not_specified'),
                     ),
                     const SizedBox(height: 12),
                     _SummaryCard(
                       icon: Icons.people,
-                      title: 'Hushåll',
+                      title: l10n.t('household'),
                       value: _getHouseholdSummary(
+                        context,
                         onboardingState.adultCount,
                         onboardingState.childCount,
                         onboardingState.infantCount,
@@ -166,42 +169,42 @@ class OnboardingSummaryScreen extends ConsumerWidget {
                     const SizedBox(height: 12),
                     _SummaryCard(
                       icon: Icons.privacy_tip,
-                      title: 'Dela statistik',
-                      value: onboardingState.allowAggregation ? 'Ja' : 'Nej',
+                      title: l10n.t('share_data'),
+                      value: onboardingState.allowAggregation ? l10n.t('yes') : l10n.t('no'),
                     ),
                     const SizedBox(height: 24),
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.blue[50],
+                        color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.blue[200]!),
+                        border: Border.all(color: const Color(0xFFBBDEFB)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Beredskapsnivåer',
+                            l10n.t('preparedness_levels'),
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blue[900],
+                                  color: const Color(0xFF005AA0),
                                 ),
                           ),
                           const SizedBox(height: 16),
                           _ProgressRow(
-                            label: '24 timmar',
+                            label: l10n.t('24_hours'),
                             completed: 0,
                             total: 8,
                           ),
                           const SizedBox(height: 12),
                           _ProgressRow(
-                            label: '72 timmar',
+                            label: l10n.t('72_hours'),
                             completed: 0,
                             total: 15,
                           ),
                           const SizedBox(height: 12),
                           _ProgressRow(
-                            label: '7 dagar',
+                            label: l10n.t('7_days'),
                             completed: 0,
                             total: 25,
                           ),
@@ -222,7 +225,7 @@ class OnboardingSummaryScreen extends ConsumerWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Börja med 24-timmars beredskap för snabba resultat!',
+                              l10n.t('start_24h'),
                               style: TextStyle(color: Colors.amber[900]),
                             ),
                           ),
@@ -241,9 +244,9 @@ class OnboardingSummaryScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Börja förbereda',
-                  style: TextStyle(fontSize: 16),
+                child: Text(
+                  l10n.t('start_preparing'),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ],
@@ -326,15 +329,19 @@ class _ProgressRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF212121),
+            ),
           ),
         ),
         Expanded(
@@ -344,16 +351,18 @@ class _ProgressRow extends StatelessWidget {
               Expanded(
                 child: LinearProgressIndicator(
                   value: completed / total,
-                  backgroundColor: Colors.grey[300],
+                  backgroundColor: const Color(0xFFE0E0E0),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF9E9E9E)),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
               const SizedBox(width: 12),
               Text(
-                '$completed av $total',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[700],
-                    ),
+                '$completed ${l10n.t('of')} $total',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF424242),
+                ),
               ),
             ],
           ),

@@ -70,7 +70,7 @@ class PrepCategory with _$PrepCategory {
   static PrepCategory communication() => PrepCategory(
         id: 'communication',
         name: 'Communication',
-        icon: 'phone',
+        icon: 'radio',
         priority: 5,
         msbGuideline: 'https://www.msb.se/sv/amnesomraden/krisberedskap--civilt-forsvar/krisberedskap/checklista-for-hushall/',
       );

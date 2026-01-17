@@ -66,3 +66,4 @@ build/web/
 
 # Keep web source files
 !web/
+.vercel

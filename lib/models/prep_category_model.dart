@@ -52,7 +52,7 @@ class PrepCategory with _$PrepCategory {
       );
 
   static PrepCategory heating() => PrepCategory(
-        id: 'heating',
+        id: 'heat',
         name: 'Heating',
         icon: 'local_fire_department',
         priority: 3,
@@ -68,7 +68,7 @@ class PrepCategory with _$PrepCategory {
       );
 
   static PrepCategory communication() => PrepCategory(
-        id: 'communication',
+        id: 'radio',
         name: 'Communication',
         icon: 'radio',
         priority: 5,
@@ -76,7 +76,7 @@ class PrepCategory with _$PrepCategory {
       );
 
   static PrepCategory firstAid() => PrepCategory(
-        id: 'first_aid',
+        id: 'medicine',
         name: 'First Aid',
         icon: 'medical_services',
         priority: 6,
@@ -84,7 +84,7 @@ class PrepCategory with _$PrepCategory {
       );
 
   static PrepCategory lighting() => PrepCategory(
-        id: 'lighting',
+        id: 'light',
         name: 'Lighting',
         icon: 'lightbulb',
         priority: 7,
@@ -125,9 +125,8 @@ class PrepCategory with _$PrepCategory {
       communication(),
       firstAid(),
       lighting(),
-      documents(),
       cash(),
-      other(),
+      // other() - Removed to hide from UI
     ];
   }
 }

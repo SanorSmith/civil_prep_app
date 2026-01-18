@@ -184,14 +184,14 @@ class PreparednessCalculator {
     final items = <PrepItem>[
       PrepItem.create(
         userId: userId,
-        categoryId: 'heating',
+        categoryId: 'heat',
         name: 'Filtar',
         targetQuantity: (profile.adultCount + profile.childCount + profile.infantCount).toDouble(),
         unit: 'st',
       ),
       PrepItem.create(
         userId: userId,
-        categoryId: 'heating',
+        categoryId: 'heat',
         name: 'Varma kläder',
         targetQuantity: (profile.adultCount + profile.childCount).toDouble(),
         unit: 'set',
@@ -202,7 +202,7 @@ class PreparednessCalculator {
     if (profile.housingType == HousingType.house || profile.housingType == HousingType.rural) {
       items.add(PrepItem.create(
         userId: userId,
-        categoryId: 'heating',
+        categoryId: 'heat',
         name: 'Alternativ värmekälla',
         targetQuantity: 1,
         unit: 'st',
@@ -258,21 +258,21 @@ class PreparednessCalculator {
     return [
       PrepItem.create(
         userId: userId,
-        categoryId: 'communication',
+        categoryId: 'radio',
         name: 'Batteridriven radio',
         targetQuantity: 1,
         unit: 'st',
       ),
       PrepItem.create(
         userId: userId,
-        categoryId: 'communication',
+        categoryId: 'radio',
         name: 'Extra batterier (radio)',
         targetQuantity: 6,
         unit: 'st',
       ),
       PrepItem.create(
         userId: userId,
-        categoryId: 'communication',
+        categoryId: 'radio',
         name: 'Powerbank',
         targetQuantity: 1,
         unit: 'st',
@@ -284,28 +284,28 @@ class PreparednessCalculator {
     return [
       PrepItem.create(
         userId: userId,
-        categoryId: 'first_aid',
+        categoryId: 'medicine',
         name: 'Första hjälpen-kit',
         targetQuantity: 1,
         unit: 'st',
       ),
       PrepItem.create(
         userId: userId,
-        categoryId: 'first_aid',
+        categoryId: 'medicine',
         name: 'Smärtstillande',
         targetQuantity: 1,
         unit: 'förpackning',
       ),
       PrepItem.create(
         userId: userId,
-        categoryId: 'first_aid',
+        categoryId: 'medicine',
         name: 'Plåster',
         targetQuantity: 1,
         unit: 'ask',
       ),
       PrepItem.create(
         userId: userId,
-        categoryId: 'first_aid',
+        categoryId: 'medicine',
         name: 'Febernedsättande',
         targetQuantity: 1,
         unit: 'förpackning',
@@ -317,28 +317,28 @@ class PreparednessCalculator {
     return [
       PrepItem.create(
         userId: userId,
-        categoryId: 'lighting',
+        categoryId: 'light',
         name: 'Ficklampa',
         targetQuantity: 2,
         unit: 'st',
       ),
       PrepItem.create(
         userId: userId,
-        categoryId: 'lighting',
+        categoryId: 'light',
         name: 'Batterier (ficklampa)',
         targetQuantity: 8,
         unit: 'st',
       ),
       PrepItem.create(
         userId: userId,
-        categoryId: 'lighting',
+        categoryId: 'light',
         name: 'Stearinljus',
         targetQuantity: 10,
         unit: 'st',
       ),
       PrepItem.create(
         userId: userId,
-        categoryId: 'lighting',
+        categoryId: 'light',
         name: 'Tändstickor',
         targetQuantity: 2,
         unit: 'askar',

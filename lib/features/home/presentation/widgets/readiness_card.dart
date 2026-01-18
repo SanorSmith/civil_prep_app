@@ -6,23 +6,40 @@ import '../../../../core/localization/app_localizations.dart';
 class ReadinessCard extends StatelessWidget {
   final String level;
   final double percentage;
+  final VoidCallback? onTap;
 
   const ReadinessCard({
     super.key,
     required this.level,
     required this.percentage,
+    this.onTap,
   });
 
-  Color get _progressColor => AppColors.getProgressColor(percentage);
+  Color get _progressColor {
+    // Use specific colors for each level
+    if (level == '24 timmar' || level == '24 hours' || level == '24h') {
+      return const Color(0xFF4CAF50); // Green
+    }
+    if (level == '72 timmar' || level == '72 hours' || level == '72h') {
+      return const Color(0xFFFF9800); // Orange
+    }
+    if (level == '7 dagar' || level == '7 days' || level == '7d') {
+      return const Color(0xFF2196F3); // Blue
+    }
+    return AppColors.getProgressColor(percentage);
+  }
 
   @override
   Widget build(BuildContext context) {
     final isComplete = percentage >= 100;
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.s),
-        child: Column(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.s),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
@@ -73,6 +90,7 @@ class ReadinessCard extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ],
+        ),
         ),
       ),
     );

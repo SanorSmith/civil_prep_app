@@ -100,25 +100,25 @@ class AppColors {
           'light': categoryFoodLight,
           'dark': categoryFoodDark,
         };
-      case 'heating':
+      case 'heat':
         return {
           'primary': categoryHeating,
           'light': categoryHeatingLight,
           'dark': categoryHeatingDark,
         };
-      case 'lighting':
+      case 'light':
         return {
           'primary': categoryLighting,
           'light': categoryLightingLight,
           'dark': categoryLightingDark,
         };
-      case 'communication':
+      case 'radio':
         return {
           'primary': categoryCommunication,
           'light': categoryCommunicationLight,
           'dark': categoryCommunicationDark,
         };
-      case 'first_aid':
+      case 'medicine':
         return {
           'primary': categoryFirstAid,
           'light': categoryFirstAidLight,

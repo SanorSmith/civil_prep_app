@@ -121,4 +121,46 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_THEME_MODE_KEY);
   }
+
+  // Completed items tracking
+  static const String _completedItemsKey = 'completed_items';
+  static const String _itemCompletedAtPrefix = 'item_completed_at_';
+  
+  static Future<Set<String>> getCompletedItemIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    final json = prefs.getString(_completedItemsKey);
+    
+    if (json == null) return {};
+    
+    final List<dynamic> list = jsonDecode(json);
+    return Set<String>.from(list);
+  }
+  
+  static Future<void> saveCompletedItemIds(Set<String> itemIds) async {
+    final prefs = await SharedPreferences.getInstance();
+    final json = jsonEncode(itemIds.toList());
+    await prefs.setString(_completedItemsKey, json);
+  }
+  
+  static Future<void> saveItemCompletedAt(String itemId, DateTime timestamp) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      '$_itemCompletedAtPrefix$itemId',
+      timestamp.toIso8601String(),
+    );
+  }
+  
+  static Future<DateTime?> getItemCompletedAt(String itemId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final value = prefs.getString('$_itemCompletedAtPrefix$itemId');
+    
+    if (value == null) return null;
+    
+    return DateTime.parse(value);
+  }
+  
+  static Future<void> removeItemCompletedAt(String itemId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('$_itemCompletedAtPrefix$itemId');
+  }
 }

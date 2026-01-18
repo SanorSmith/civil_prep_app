@@ -5,6 +5,7 @@ import '../../../../models/prep_item_model.dart';
 import '../../../../models/prep_category_model.dart';
 import '../../../../models/user_model.dart';
 import '../../../../core/services/storage_service.dart';
+import '../../../../core/services/items_service.dart';
 import '../../../preparedness/domain/services/preparedness_calculator.dart';
 import '../../../preparedness/domain/services/progress_calculator.dart';
 
@@ -65,6 +66,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
 
   final _prepCalculator = PreparednessCalculator();
   final _progressCalculator = ProgressCalculator();
+  final _itemsService = ItemsService();
 
   Future<void> loadData() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -183,21 +185,28 @@ class HomeNotifier extends StateNotifier<HomeState> {
   }
 
   Future<void> refreshProgress() async {
-    if (state.items.isEmpty) return;
+    try {
+      // Use unified ItemsService for all progress tracking
+      final progressByLevel = await _itemsService.getProgressByLevel();
+      
+      // Keep old progress calculator for category progress and next steps
+      final categoryProgress = state.items.isNotEmpty 
+          ? _progressCalculator.getCategorySummary(state.items)
+          : <String, double>{};
+      final nextSteps = state.items.isNotEmpty
+          ? _progressCalculator.getNextSteps(state.items, 3)
+          : <PrepItem>[];
 
-    final progress24h = _progressCalculator.calculateProgressForLevel('24h', state.items);
-    final progress72h = _progressCalculator.calculateProgressForLevel('72h', state.items);
-    final progress7d = _progressCalculator.calculateProgressForLevel('7d', state.items);
-    final categoryProgress = _progressCalculator.getCategorySummary(state.items);
-    final nextSteps = _progressCalculator.getNextSteps(state.items, 3);
-
-    state = state.copyWith(
-      progress24h: progress24h,
-      progress72h: progress72h,
-      progress7d: progress7d,
-      categoryProgress: categoryProgress,
-      nextSteps: nextSteps,
-    );
+      state = state.copyWith(
+        progress24h: progressByLevel['24h'] ?? 0.0,
+        progress72h: progressByLevel['72h'] ?? 0.0,
+        progress7d: progressByLevel['7d'] ?? 0.0,
+        categoryProgress: categoryProgress,
+        nextSteps: nextSteps,
+      );
+    } catch (e) {
+      print('Error refreshing progress: $e');
+    }
   }
 
   Future<void> markItemComplete(String itemId, bool completed) async {
@@ -212,12 +221,11 @@ class HomeNotifier extends StateNotifier<HomeState> {
     final updatedItems = List<PrepItem>.from(state.items);
     updatedItems[itemIndex] = updatedItem;
 
-    // Save to Hive
+    // Save to unified ItemsService database
     try {
-      final itemsBox = await Hive.openBox('prep_items');
-      await itemsBox.put(updatedItem.id, updatedItem);
+      await _itemsService.toggleItemCompletion(itemId);
     } catch (e) {
-      print('Error saving item to Hive: $e');
+      print('Error saving item: $e');
     }
 
     state = state.copyWith(items: updatedItems);
@@ -236,13 +244,9 @@ class HomeNotifier extends StateNotifier<HomeState> {
     final updatedItems = List<PrepItem>.from(state.items);
     updatedItems[itemIndex] = updatedItem;
 
-    // Save to Hive
-    try {
-      final itemsBox = await Hive.openBox('prep_items');
-      await itemsBox.put(updatedItem.id, updatedItem);
-    } catch (e) {
-      print('Error saving item to Hive: $e');
-    }
+    // Note: ItemsService doesn't have updateQuantity yet
+    // This is for the old PrepItem system which may be deprecated
+    // For now, just update local state
 
     state = state.copyWith(items: updatedItems);
     await refreshProgress();
